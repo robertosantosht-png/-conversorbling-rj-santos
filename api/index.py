@@ -1,4 +1,3 @@
-# api/index.py
 from fastapi import FastAPI
 from pydantic import BaseModel
 
@@ -11,3 +10,6 @@ class ConverterRequest(BaseModel):
 @app.get("/")
 def home():
     return {"status": "ok"}
+
+# 👇 IMPORTANTE PARA VERCEL
+handler = app
