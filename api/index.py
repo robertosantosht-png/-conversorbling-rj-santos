@@ -30,3 +30,7 @@ def converter(dados: ConverterRequest):
         "mensagem": "Arquivo gerado com sucesso",
         "linhas": len(df)
     }
+
+@app.get("/")
+def home():
+    return {"status": "ok"}
