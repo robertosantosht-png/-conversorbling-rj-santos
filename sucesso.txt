@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Sucesso! | Arquivo Gerado</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 min-h-screen flex items-center justify-center p-6 font-sans">
+    <div class="bg-white rounded-[2.5rem] shadow-2xl max-w-lg w-full p-12 text-center border border-slate-100 relative overflow-hidden">
+        <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-green-400 to-blue-500"></div>
+
+        <div class="mb-10">
+            <div class="inline-flex items-center justify-center w-28 h-28 bg-green-100 text-green-600 rounded-full mb-6">
+                <i class="fa-solid fa-check text-6xl"></i>
+            </div>
+            <h1 class="text-4xl font-black text-slate-900 mb-3 tracking-tight">Tudo pronto!</h1>
+            <p class="text-slate-500 text-lg leading-relaxed">Sua planilha foi gerada com sucesso e o download já começou.</p>
+        </div>
+
+        <div class="bg-slate-50 rounded-3xl p-8 mb-10 text-left border border-slate-200">
+            <h3 class="font-black text-slate-800 mb-6 flex items-center text-xl">
+                <i class="fa-solid fa-rocket mr-3 text-blue-500"></i> Próximos Passos
+            </h3>
+            <div class="space-y-6">
+                <div class="flex items-start">
+                    <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0 font-bold shadow-lg">1</div>
+                    <p class="text-slate-600 text-sm leading-relaxed">Abra o Excel e confira se os preços e marcas estão corretos.</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0 font-bold shadow-lg">2</div>
+                    <p class="text-slate-600 text-sm leading-relaxed">No Bling, vá em <strong>Cadastros > Produtos > Importar Produtos</strong>.</p>
+                </div>
+                <div class="flex items-start">
+                    <div class="bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center mr-4 flex-shrink-0 font-bold shadow-lg">3</div>
+                    <p class="text-slate-600 text-sm leading-relaxed">Selecione a planilha e clique em <strong>Validar</strong>. Pronto!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <a href="/" class="block w-full bg-slate-900 hover:bg-black text-white font-black py-5 rounded-2xl transition-all shadow-xl transform hover:scale-[1.02]">
+                CONVERTER OUTRO XML
+            </a>
+        </div>
+    </div>
+</body>
+</html>

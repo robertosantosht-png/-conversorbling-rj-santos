@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversor XML para Bling | Profissional</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 min-h-screen py-12 px-4">
+    <div class="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-10 border border-slate-100">
+        <div class="text-center mb-10">
+            <h1 class="text-4xl font-black text-slate-900 mb-2">Conversor <span class="text-green-600">XML para Bling</span></h1>
+            <p class="text-slate-500">Transforme XML de fornecedores em planilhas prontas para importação.</p>
+        </div>
+        
+        <form id="converterForm" action="/converter" method="post" enctype="multipart/form-data" class="space-y-6">
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 ml-1">Seu Nome</label>
+                    <input type="text" name="nome" placeholder="Roberto Santos" required class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 ml-1">Seu E-mail</label>
+                    <input type="email" name="email" placeholder="roberto@exemplo.com" required class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none">
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 ml-1">Markup (%)</label>
+                    <input type="number" step="0.01" name="markup" value="2.0" required class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 ml-1">CEST Padrão</label>
+                    <input type="text" name="cest" value="2805900" required class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none">
+                </div>
+                <div class="space-y-2">
+                    <label class="text-sm font-bold text-slate-700 ml-1">Modo de Conversão</label>
+                    <select name="modo_conversao" class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none bg-white font-bold text-green-700">
+                        <option value="Variação">Com Variação (Pai e Filho)</option>
+                        <option value="Simples">Produto Simples (Apenas Pai)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="space-y-2">
+                <label class="text-sm font-bold text-slate-700 ml-1">Marca Padrão (Caso não venha no XML)</label>
+                <input type="text" name="marca_padrao" placeholder="Ex: Minha Loja" class="w-full px-5 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-green-100 outline-none">
+            </div>
+
+            <div class="border-2 border-dashed border-slate-200 rounded-2xl p-10 text-center bg-slate-50 hover:border-green-400 hover:bg-green-50 transition-all group">
+                <input type="file" name="file" id="fileInput" class="hidden" accept=".xml" required>
+                <label for="fileInput" class="cursor-pointer">
+                    <i class="fa-solid fa-cloud-arrow-up text-5xl text-slate-300 group-hover:text-green-500 transition-colors mb-4 block"></i>
+                    <span id="fileLabel" class="text-slate-600 font-bold text-lg">Clique para selecionar o XML</span>
+                </label>
+            </div>
+
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-5 rounded-2xl text-xl shadow-xl transition-all active:scale-95">
+                CONVERTER E BAIXAR EXCEL
+            </button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('fileInput').onchange = function() {
+            document.getElementById('fileLabel').innerHTML = `<span class="text-green-600">Arquivo: ${this.files[0].name}</span>`;
+        };
+        document.getElementById('converterForm').onsubmit = function() {
+            setTimeout(() => { window.location.href = "/sucesso"; }, 3000);
+        };
+    </script>
+</body>
+</html>
