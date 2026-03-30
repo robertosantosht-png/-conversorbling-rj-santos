@@ -1,8 +1,0 @@
-flask
-pandas
-openpyxl
-python-dotenv
-fastapi
-uvicorn
-pydantic
-python-multipart
