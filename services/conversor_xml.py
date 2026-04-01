@@ -1,111 +1,123 @@
-import xml.etree.ElementTree as ET
-from datetime import datetime
+import json
+import pandas as pd
+from lxml import etree
 
-def processar_xml(xml_content, marca, cest, markup, modo):
-    ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
-    root = ET.fromstring(xml_content)
-    data_atual = datetime.now().strftime('%d%m%Y')
-    seq = 1
-    produtos = []
+with open('/tmp/config.json', 'r') as f:
+    config = json.load(f)
+
+markup = config['markup']
+cest = config['cest']
+modo_conversao = config['modo_conversao']
+marca_padrao = config['marca_padrao']
+
+tree = etree.parse('/tmp/entrada.xml')
+root = tree.getroot()
+ns = {'nfe': 'http://www.portalfiscal.inf.br/nfe'}
+
+data = []
+for det in root.findall('.//nfe:det', ns):
+    prod = det.find('nfe:prod', ns)
+    if prod is None:
+        continue
     
-    volumes_element = root.find('.//nfe:transp/nfe:vol/nfe:qVol', ns)
-    volumes = volumes_element.text if volumes_element is not None else ""
+    codigo = prod.findtext('nfe:cProd', '', ns)
+    descricao = prod.findtext('nfe:xProd', '', ns)
+    unidade = prod.findtext('nfe:uCom', '', ns)
+    ncm = prod.findtext('nfe:NCM', '', ns)
+    ean = prod.findtext('nfe:cEAN', '', ns)
+    preco_compra = float(prod.findtext('nfe:vUnCom', '0', ns))
+    qtd = float(prod.findtext('nfe:qCom', '0', ns))
     
-    for det in root.findall('.//nfe:det', ns):
-        cProd = det.find('.//nfe:prod/nfe:cProd', ns).text
-        xProd = det.find('.//nfe:prod/nfe:xProd', ns).text
-        NCM = det.find('.//nfe:prod/nfe:NCM', ns).text
-        CFOP = det.find('.//nfe:prod/nfe:CFOP', ns).text
-        EAN_element = det.find('.//nfe:prod/nfe:cEAN', ns)
-        EAN = EAN_element.text if EAN_element is not None else ""
-        qCom = float(det.find('.//nfe:prod/nfe:qCom', ns).text)
-        vUnCom = float(det.find('.//nfe:prod/nfe:vUnCom', ns).text)
-        orig_element = det.find('.//nfe:ICMS*/nfe:orig', ns)
-        orig = orig_element.text if orig_element is not None else ""
-        
-        preco_venda = vUnCom * markup
-        codigo_pai = f"{cProd}/{data_atual}-{seq}"
-        seq += 1
-        
-        if modo == 'VARIAÇÃO':
-            estoque_pai = 0
-            is_pai_pai = True
-            produto_pai = {
-                'cProd': cProd,
-                'xProd': xProd,
-                'NCM': NCM,
-                'CEST': cest,
-                'EAN': EAN,
-                'qCom': qCom,
-                'vUnCom': vUnCom,
-                'orig': orig,
-                'CFOP': CFOP,
-                'Volumes': volumes,
-                'marca': marca,
-                'preco_venda': preco_venda,
-                'codigo_pai': codigo_pai,
-                'codigo_filho': "",
-                'estoque': estoque_pai,
-                'peso_liquido': 0.8,
-                'peso_bruto': 1.0,
-                'largura': 30,
-                'altura': 30,
-                'profundidade': 30,
-                'is_pai': is_pai_pai
-            }
-            produtos.append(produto_pai)
-            
-            for i in range(1, int(qCom) + 1):
-                codigo_filho = f"{codigo_pai}-{i}"
-                produto_filho = {
-                    'cProd': cProd,
-                    'xProd': xProd,
-                    'NCM': NCM,
-                    'CEST': cest,
-                    'EAN': EAN,
-                    'qCom': qCom,
-                    'vUnCom': vUnCom,
-                    'orig': orig,
-                    'CFOP': CFOP,
-                    'Volumes': volumes,
-                    'marca': marca,
-                    'preco_venda': preco_venda,
-                    'codigo_pai': codigo_pai,
-                    'codigo_filho': codigo_filho,
-                    'estoque': 1,
-                    'peso_liquido': 0.8,
-                    'peso_bruto': 1.0,
-                    'largura': 30,
-                    'altura': 30,
-                    'profundidade': 30,
-                    'is_pai': False
-                }
-                produtos.append(produto_filho)
-        else:  # modo == 'SIMPLES'
-            estoque = qCom
-            produto = {
-                'cProd': cProd,
-                'xProd': xProd,
-                'NCM': NCM,
-                'CEST': cest,
-                'EAN': EAN,
-                'qCom': qCom,
-                'vUnCom': vUnCom,
-                'orig': orig,
-                'CFOP': CFOP,
-                'Volumes': volumes,
-                'marca': marca,
-                'preco_venda': preco_venda,
-                'codigo_pai': codigo_pai,
-                'codigo_filho': "",
-                'estoque': estoque,
-                'peso_liquido': 0.8,
-                'peso_bruto': 1.0,
-                'largura': 30,
-                'altura': 30,
-                'profundidade': 30,
-                'is_pai': True
-            }
-            produtos.append(produto)
+    preco = preco_compra * markup
+    preco_custo = preco_compra
+    estoque = qtd
+    codigo_pai = codigo
+    codigo_filho = ''
+    marca = marca_padrao
+    cfop = ''
+    volumes = 1
+    origem = ''
+    peso_liquido = float(prod.findtext('nfe:qCom', '0', ns))  # assuming same as qtd for simplicity
+    peso_bruto = peso_liquido
+    largura = 0
+    altura = 0
+    profundidade = 0
+    produto_variacao = ''
     
-    return produtos
+    if modo_conversao == 'Simples':
+        data.append({
+            'Código': codigo,
+            'Descrição': descricao,
+            'Unidade': unidade,
+            'NCM': ncm,
+            'CEST': cest,
+            'EAN': ean,
+            'Preço': preco,
+            'Preço de custo': preco_custo,
+            'Preço de compra': preco_compra,
+            'Estoque': estoque,
+            'Código Pai': '',
+            'Código Filho': '',
+            'Marca': marca,
+            'CFOP': cfop,
+            'Volumes': volumes,
+            'Origem': origem,
+            'Peso líquido': peso_liquido,
+            'Peso bruto': peso_bruto,
+            'Largura': largura,
+            'Altura': altura,
+            'Profundidade': profundidade,
+            'Produto Variação': produto_variacao
+        })
+    elif modo_conversao == 'Variação':
+        data.append({
+            'Código': codigo_pai,
+            'Descrição': descricao,
+            'Unidade': unidade,
+            'NCM': ncm,
+            'CEST': cest,
+            'EAN': ean,
+            'Preço': preco,
+            'Preço de custo': preco_custo,
+            'Preço de compra': preco_compra,
+            'Estoque': estoque,
+            'Código Pai': codigo_pai,
+            'Código Filho': '',
+            'Marca': marca,
+            'CFOP': cfop,
+            'Volumes': volumes,
+            'Origem': origem,
+            'Peso líquido': peso_liquido,
+            'Peso bruto': peso_bruto,
+            'Largura': largura,
+            'Altura': altura,
+            'Profundidade': profundidade,
+            'Produto Variação': 'Pai'
+        })
+        data.append({
+            'Código': f'{codigo}-VAR',
+            'Descrição': f'{descricao} - Variação',
+            'Unidade': unidade,
+            'NCM': ncm,
+            'CEST': cest,
+            'EAN': ean,
+            'Preço': preco,
+            'Preço de custo': preco_custo,
+            'Preço de compra': preco_compra,
+            'Estoque': estoque,
+            'Código Pai': codigo_pai,
+            'Código Filho': f'{codigo}-VAR',
+            'Marca': marca,
+            'CFOP': cfop,
+            'Volumes': volumes,
+            'Origem': origem,
+            'Peso líquido': peso_liquido,
+            'Peso bruto': peso_bruto,
+            'Largura': largura,
+            'Altura': altura,
+            'Profundidade': profundidade,
+            'Produto Variação': 'Filho'
+        })
+
+df = pd.DataFrame(data)
+df.to_excel('IMPORTAR_BLING.xlsx', index=False)

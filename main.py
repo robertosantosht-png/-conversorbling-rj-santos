@@ -1,94 +1,53 @@
-from fastapi import FastAPI, UploadFile, Form
-from fastapi.responses import HTMLResponse, FileResponse
-from fastapi.staticfiles import StaticFiles
+from fastapi import FastAPI, UploadFile, File, Form, HTMLResponse, FileResponse
+from fastapi.responses import RedirectResponse
+import subprocess
+import shutil
 import os
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
-@app.get("/", response_class=HTMLResponse)
-def index():
-    with open("index.html", "r", encoding="utf-8") as f:
-        return f.read()
-
-
-import shutil
-import os
+@app.get("/")
+async def root():
+    with open("index.txt", "r") as f:
+        return HTMLResponse(content=f.read())
 
 @app.post("/converter")
-async def converter_xml(
-    nome_cliente: str = Form(...),
-    email_cliente: str = Form(...),
-    markup: float = Form(...),
-    cest: str = Form(...),
-    modo: str = Form(...),
-    marca: str = Form(""),
-    xml_file: UploadFile = None
-):
-
-    # 🔹 CONTEÚDO DO XML ENVIADO PELO CLIENTE
-    conteudo_xml = await xml_file.read()
-
-    # 🔹 CAMINHO TEMPORÁRIO NO RAILWAY
-    xml_temporario = "/tmp/entrada.xml"
-
-    # 🔹 SALVAR O XML TEMPORARIAMENTE
-    with open(xml_temporario, "wb") as f:
-        f.write(conteudo_xml)
-
-    # 🔹 CRIAR PASTA 'xml' QUE O SEU SCRIPT USA
-    os.makedirs("xml", exist_ok=True)
-
-    # 🔹 COPIAR O XML PARA A PASTA DO SEU SCRIPTS
-    shutil.copy(xml_temporario, f"xml/{xml_file.filename}")
-
-    # 🔹 EXECUTAR O SCRIPT DE CONVERSÃO
-    # 3. Agora chamamos seu script para gerar o Excel
-    import subprocess
-    subprocess.run(["python3", "conversor_xml.py"], check=True)
-
-    # 🔹 ARQUIVO QUE SEU SCRIPT GERA
-    caminho_excel = "IMPORTAR_BLING.xlsx"
-
-    if not os.path.exists(caminho_excel):
-        return HTMLResponse("<h1>ERRO: O conversor não gerou o arquivo IMPORTAR_BLING.xlsx</h1>", status_code=500)
+async def converter(file: UploadFile = File(...)):
+    # Save uploaded XML to /tmp
+    xml_path = f"/tmp/{file.filename}"
+    with open(xml_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
     
+    # Copy to xml folder
+    xml_folder = "xml"
+    os.makedirs(xml_folder, exist_ok=True)
+    shutil.copy(xml_path, xml_folder)
+    
+    # Run conversor_xml.py
+    result = subprocess.run(["python", "conversor_xml.py"], capture_output=True, text=True)
+    if result.returncode != 0:
+        return {"error": "Failed to run conversor_xml.py"}
+    
+    # Check for IMPORTAR_BLING.xlsx
+    xlsx_path = "IMPORTAR_BLING.xlsx"
+    if not os.path.exists(xlsx_path):
+        return {"error": "IMPORTAR_BLING.xlsx not found"}
+    
+    # Copy to /tmp
+    tmp_xlsx = "/tmp/IMPORTAR_BLING.xlsx"
+    shutil.copy(xlsx_path, tmp_xlsx)
+    
+    # Redirect to sucesso
+    return RedirectResponse(url="/sucesso", status_code=303)
 
-    # 🔹 COPIAR PARA /tmp PARA PERMITIR DOWNLOAD
-    caminho_tmp = "/tmp/IMPORTAR_BLING.xlsx"
-    shutil.copy(caminho_excel, caminho_tmp)
-
-    # 🔹 ABRIR PÁGINA DE SUCESSO
-    with open("sucesso.html", "r", encoding="utf-8") as f:
-        html = f.read().replace("{nome_cliente}", nome_cliente)
-
-    return HTMLResponse(html)
-    # ---------------------------------------------------
-
-    # Carrega página de sucesso
-    with open("sucesso.html", "r", encoding="utf-8") as f:
-        html = f.read()
-        html = html.replace("{nome_cliente}", nome_cliente)
-        html = html.replace("{arquivo}", nome_arquivo)
-
-    return HTMLResponse(html)
-
+@app.get("/sucesso")
+async def sucesso():
+    with open("sucesso.txt", "r") as f:
+        return HTMLResponse(content=f.read())
 
 @app.get("/download/{arquivo}")
-def download(arquivo: str):
-
-    caminho = f"/tmp/{arquivo}"
-
-    # Evita Internal Server Error
-    if not os.path.exists(caminho):
-        return HTMLResponse(
-            "<h1>Erro: Arquivo não encontrado no servidor.</h1>",
-            status_code=404
-        )
-
-    return FileResponse(
-        caminho,
-        media_type="application/vnd.ms-excel",
-        filename=arquivo
-    )
+async def download(arquivo: str):
+    file_path = f"/tmp/{arquivo}"
+    if os.path.exists(file_path):
+        return FileResponse(path=file_path, filename=arquivo)
+    return {"error": "File not found"}
