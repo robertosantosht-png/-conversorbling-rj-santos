@@ -1,143 +1,160 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conversor XML → Bling</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Conversor Bling → Excel</title>
 
     <style>
         body {
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #7F00FF, #E100FF);
+            background-color: #e7f7ee;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
+            padding: 20px;
         }
 
-        .card {
-            background: white;
-            padding: 40px;
-            border-radius: 16px;
-            width: 420px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        .container {
+            background: #d8f3dd;
+            width: 95%;
+            max-width: 900px;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.15);
         }
 
         h1 {
             text-align: center;
-            font-size: 26px;
-            margin-bottom: 10px;
-            background: linear-gradient(135deg, #7F00FF, #E100FF);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        p.subtitle {
-            text-align: center;
-            color: #666;
-            margin-top: 0;
             margin-bottom: 30px;
+            color: #2d5a3d;
+            font-size: 26px;
         }
 
+        /* GRID PRINCIPAL (2 colunas) */
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .full {
+            grid-column: span 2;
+        }
+
+        /* INPUTS */
         label {
-            font-weight: 600;
-            margin-top: 16px;
+            font-weight: bold;
+            margin-bottom: 6px;
             display: block;
+            color: #1f4730;
         }
 
         input, select {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 1px solid #94c9a8;
             border-radius: 10px;
-            margin-top: 6px;
-            font-size: 15px;
-            transition: 0.2s;
+            font-size: 16px;
         }
 
-        input:focus, select:focus {
-            border-color: #7F00FF;
-            box-shadow: 0 0 6px rgba(127, 0, 255, 0.4);
-        }
-
-        .upload-area {
-            margin-top: 10px;
-            border: 2px dashed #bbb;
+        .upload-box {
+            background: white;
+            padding: 20px;
             border-radius: 12px;
-            padding: 25px;
+            border: 2px dashed #73b38c;
             text-align: center;
-            color: #777;
-            cursor: pointer;
-            transition: 0.2s;
         }
 
-        .upload-area:hover {
-            background: #f9f2ff;
-            border-color: #7F00FF;
-            color: #7F00FF;
-        }
-
-        .btn {
+        button {
             width: 100%;
-            margin-top: 25px;
-            padding: 14px;
+            padding: 18px;
+            background: #3c8f5e;
+            color: white;
             border: none;
             border-radius: 12px;
-            font-size: 17px;
-            font-weight: 600;
-            color: white;
+            font-size: 18px;
             cursor: pointer;
-            background: linear-gradient(135deg, #7F00FF, #E100FF);
-            box-shadow: 0 6px 18px rgba(127, 0, 255, 0.4);
-            transition: 0.2s;
         }
 
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(127, 0, 255, 0.55);
+        button:hover {
+            background: #2f744c;
+        }
+
+        /* RESPONSIVIDADE MOBILE */
+        @media (max-width: 640px) {
+
+            .grid {
+                grid-template-columns: 1fr; /* de 2 colunas → 1 coluna */
+            }
+
+            .full {
+                grid-column: span 1;
+            }
+
+            h1 {
+                font-size: 22px;
+            }
+
+            button {
+                font-size: 17px;
+                padding: 15px;
+            }
         }
     </style>
 </head>
 
 <body>
-    <div class="card">
-        <h1>Conversor XML → Bling</h1>
-        <p class="subtitle">Transforme sua NF-e em planilha com um clique</p>
 
-        <form action="http://localhost:8000/converter" method="POST" enctype="multipart/form-data">
-             
-            <label for="nome">Nome do cliente</label>
-            <input type="text" id="nome" name="nome" required>
+    <div class="container">
 
-            <label for="email">E-mail do cliente</label>
-            <input type="email" id="email" name="email" required>
+        <h1>Conversor Bling → Excel</h1>
 
-            <label>Arquivo XML</label>
-            <div class="upload-area" onclick="document.getElementById('xml').click()">
-                Clique aqui ou arraste seu arquivo XML
+        <form action="/converter" method="POST" enctype="multipart/form-data">
+
+            <div class="grid">
+
+                <div>
+                    <label>Markup (%)</label>
+                    <input type="number" step="0.01" name="markup" required>
+                </div>
+
+                <div>
+                    <label>CEST do Produto</label>
+                    <input type="text" name="cest" required>
+                </div>
+
+                <div>
+                    <label>Modo de Operação</label>
+                    <select name="modo" required>
+                        <option value="normal">Normal</option>
+                        <option value="atacado">Atacado</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Marca</label>
+                    <input type="text" name="marca">
+                </div>
+
             </div>
-            <input id="xml" name="xml_file" type="file" accept=".xml" style="display:none">
 
-            <label>Markup (%)</label>
-            <input type="number" name="markup" required>
+            <div class="full">
+                <label>Selecione o arquivo XML</label>
+                <div class="upload-box">
+                    <input type="file" name="xml_file" required>
+                </div>
+            </div>
 
-            <label>CEST</label>
-            <input type="text" name="cest" required>
+            <br>
 
-            <label>Modo de Conversão</label>
-            <select name="modo">
-                <option value="SIMPLES">Simples</option>
-                <option value="VARIAÇÃO">Variação</option>
-            </select>
-
-            <label>Marca Padrão</label>
-            <input type="text" name="marca">
-
-            <button class="btn">Converter XML</button>
+            <button type="submit">Converter XML</button>
 
         </form>
+
     </div>
+
 </body>
 </html>
