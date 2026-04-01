@@ -1,4 +1,4 @@
-fastapi>=3.13
+fastapi>=0.115.0
 uvicorn
 pandas
 openpyxl
