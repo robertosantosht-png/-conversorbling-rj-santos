@@ -1,5 +1,6 @@
-fastapi>=0.115.0
-uvicorn
+fastapi==0.115.0
+uvicorn==0.30.3
 pandas
+lxml
 openpyxl
 python-multipart
