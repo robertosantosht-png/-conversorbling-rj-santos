@@ -107,10 +107,13 @@
         <p class="subtitle">Transforme sua NF-e em planilha com um clique</p>
 
         <form action="http://localhost:8000/converter" method="POST" enctype="multipart/form-data">
+             
+            <label for="nome">Nome do cliente</label>
+            <input type="text" id="nome" name="nome" required>
 
-            <label>Arquivo XML</label>
-            <div class="upload-area" onclick="document.getElementById('xml').click()">
-                Clique aqui ou arraste seu arquivo XML
+            <label for="email">E-mail do cliente</label>
+            <input type="email" id="email" name="email" required>
+
             </div>
             <input id="xml" name="xml_file" type="file" accept=".xml" style="display:none">
 
@@ -128,6 +131,10 @@
 
             <label>Marca Padrão</label>
             <input type="text" name="marca">
+
+            <label>Arquivo XML</label>
+            <div class="upload-area" onclick="document.getElementById('xml').click()">
+                Clique aqui ou arraste seu arquivo XML
 
             <button class="btn">Converter XML</button>
 
