@@ -9,9 +9,13 @@ app = FastAPI()
 
 @app.get("/")
 async def root():
-    with open("index.txt", "r") as f:
-        return HTMLResponse(content=f.read())
+    from fastapi.responses import HTMLResponse
 
+@app.get("/", response_class=HTMLResponse)
+async def root():
+    with open("index.html", "r", encoding="utf-8") as f:
+        return f.read()
+    
 @app.post("/converter")
 async def converter(file: UploadFile = File(...)):
     # Save uploaded XML to /tmp
@@ -43,8 +47,10 @@ async def converter(file: UploadFile = File(...)):
 
 @app.get("/sucesso")
 async def sucesso():
-    with open("sucesso.txt", "r") as f:
-        return HTMLResponse(content=f.read())
+    @app.get("/sucesso", response_class=HTMLResponse)
+async def sucesso():
+    with open("sucesso.html", "r", encoding="utf-8") as f:
+        return f.read()
 
 @app.get("/download/{arquivo}")
 async def download(arquivo: str):
