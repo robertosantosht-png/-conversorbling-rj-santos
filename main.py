@@ -51,6 +51,10 @@ async def converter_xml(
     # 🔹 ARQUIVO QUE SEU SCRIPT GERA
     caminho_excel = "IMPORTAR_BLING.xlsx"
 
+    if not os.path.exists(caminho_excel):
+        return HTMLResponse("<h1>ERRO: O conversor não gerou o arquivo IMPORTAR_BLING.xlsx</h1>", status_code=500)
+    
+
     # 🔹 COPIAR PARA /tmp PARA PERMITIR DOWNLOAD
     caminho_tmp = "/tmp/IMPORTAR_BLING.xlsx"
     shutil.copy(caminho_excel, caminho_tmp)
