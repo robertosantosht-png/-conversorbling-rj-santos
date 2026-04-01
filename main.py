@@ -13,6 +13,9 @@ def index():
         return f.read()
 
 
+import shutil
+import os
+
 @app.post("/converter")
 async def converter_xml(
     nome_cliente: str = Form(...),
@@ -23,18 +26,40 @@ async def converter_xml(
     marca: str = Form(""),
     xml_file: UploadFile = None
 ):
-    # Aqui entra seu PROCESSAMENTO DO XML
-    # ---------------------------------------------------
-    # Exemplo simples (você deve substituir pelo seu código):
+
+    # 🔹 CONTEÚDO DO XML ENVIADO PELO CLIENTE
     conteudo_xml = await xml_file.read()
 
-    # Nome único para evitar conflito
-    nome_arquivo = "saida.xlsx"
-    caminho_tmp = f"/tmp/{nome_arquivo}"
+    # 🔹 CAMINHO TEMPORÁRIO NO RAILWAY
+    xml_temporario = "/tmp/entrada.xml"
 
-    # Salva TEMPORARIAMENTE na nuvem (Railway)
-    with open(caminho_tmp, "wb") as f:
+    # 🔹 SALVAR O XML TEMPORARIAMENTE
+    with open(xml_temporario, "wb") as f:
         f.write(conteudo_xml)
+
+    # 🔹 CRIAR PASTA 'xml' QUE O SEU SCRIPT USA
+    os.makedirs("xml", exist_ok=True)
+
+    # 🔹 COPIAR O XML PARA A PASTA DO SEU SCRIPTS
+    shutil.copy(xml_temporario, f"xml/{xml_file.filename}")
+
+    # 🔹 EXECUTAR O SCRIPT DE CONVERSÃO
+    # 3. Agora chamamos seu script para gerar o Excel
+    import subprocess
+    subprocess.run(["python3", "conversor_xml.py"], check=True)
+
+    # 🔹 ARQUIVO QUE SEU SCRIPT GERA
+    caminho_excel = "IMPORTAR_BLING.xlsx"
+
+    # 🔹 COPIAR PARA /tmp PARA PERMITIR DOWNLOAD
+    caminho_tmp = "/tmp/IMPORTAR_BLING.xlsx"
+    shutil.copy(caminho_excel, caminho_tmp)
+
+    # 🔹 ABRIR PÁGINA DE SUCESSO
+    with open("sucesso.html", "r", encoding="utf-8") as f:
+        html = f.read().replace("{nome_cliente}", nome_cliente)
+
+    return HTMLResponse(html)
     # ---------------------------------------------------
 
     # Carrega página de sucesso
