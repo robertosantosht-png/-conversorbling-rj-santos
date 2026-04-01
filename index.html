@@ -32,7 +32,6 @@
             font-size: 26px;
         }
 
-        /* GRID PRINCIPAL (2 colunas) */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -44,7 +43,6 @@
             grid-column: span 2;
         }
 
-        /* INPUTS */
         label {
             font-weight: bold;
             margin-bottom: 6px;
@@ -54,6 +52,7 @@
 
         input, select {
             width: 100%;
+            box-sizing: border-box;
             padding: 12px;
             border: 1px solid #94c9a8;
             border-radius: 10px;
@@ -66,6 +65,12 @@
             border-radius: 12px;
             border: 2px dashed #73b38c;
             text-align: center;
+            overflow-x: hidden;
+            max-width: 100%;
+        }
+
+        input[type="file"] {
+            max-width: 100%;
         }
 
         button {
@@ -83,21 +88,33 @@
             background: #2f744c;
         }
 
-        /* RESPONSIVIDADE MOBILE */
+        .howto {
+            margin-top: 35px;
+            padding: 20px;
+            background: #c4e9cf;
+            border-radius: 12px;
+        }
+
+        .howto h2 {
+            color: #2d5a3d;
+            margin-bottom: 12px;
+        }
+
+        .howto p {
+            line-height: 1.5;
+            margin-bottom: 8px;
+        }
+
         @media (max-width: 640px) {
-
             .grid {
-                grid-template-columns: 1fr; /* de 2 colunas → 1 coluna */
+                grid-template-columns: 1fr;
             }
-
             .full {
                 grid-column: span 1;
             }
-
             h1 {
                 font-size: 22px;
             }
-
             button {
                 font-size: 17px;
                 padding: 15px;
@@ -115,6 +132,16 @@
         <form action="/converter" method="POST" enctype="multipart/form-data">
 
             <div class="grid">
+
+                <div>
+                    <label>Nome do Cliente</label>
+                    <input type="text" name="nome_cliente" required>
+                </div>
+
+                <div>
+                    <label>E-mail do Cliente</label>
+                    <input type="email" name="email_cliente" required>
+                </div>
 
                 <div>
                     <label>Markup (%)</label>
@@ -153,6 +180,15 @@
             <button type="submit">Converter XML</button>
 
         </form>
+
+        <div class="howto">
+            <h2>Como funciona o conversor?</h2>
+            <p>1. Preencha o seu nome e e-mail — assim avisamos você sobre novidades.</p>
+            <p>2. Selecione o XML exportado do Bling.</p>
+            <p>3. Defina os dados de Markup, CEST, Modo de Operação e Marca.</p>
+            <p>4. Clique em "Converter XML".</p>
+            <p>5. O arquivo Excel será gerado automaticamente e disponível para download.</p>
+        </div>
 
     </div>
 

@@ -1,40 +1,37 @@
 from fastapi import FastAPI, UploadFile, Form
-from fastapi.responses import FileResponse
-from services.conversor_xml import processar_xml
-from services.gerar_excel import gerar_excel
-import os
+from fastapi.responses import HTMLResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 
-from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
-import os
-
-# Servir arquivos estáticos (CSS, JS, imagens, se quiser adicionar depois)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Rota para abrir o index.html
 @app.get("/", response_class=HTMLResponse)
-def abrir_index():
+def index():
     with open("index.html", "r", encoding="utf-8") as f:
         return f.read()
 
 @app.post("/converter")
 async def converter_xml(
-    xml_file: UploadFile,
+    nome_cliente: str = Form(...),
+    email_cliente: str = Form(...),
     markup: float = Form(...),
     cest: str = Form(...),
     modo: str = Form(...),
-    marca: str = Form("")
+    marca: str = Form(""),
+    xml_file: UploadFile = None
 ):
-    xml_content = await xml_file.read()
-    produtos = processar_xml(xml_content, marca, cest, markup, modo)
+    # PROCESSA O XML (seu código antigo entra aqui)
+    nome_arquivo = "saida.xlsx"
 
-    output_path = "output/produtos.xlsx"
-    gerar_excel(produtos, output_path)
+    # devolve página de sucesso
+    with open("sucesso.html", "r", encoding="utf-8") as f:
+        html = f.read()
+        html = html.replace("{nome_cliente}", nome_cliente)
+        html = html.replace("{arquivo}", nome_arquivo)
 
-    return FileResponse(
-        output_path,
-        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        filename="produtos.xlsx"
-    )
+    return HTMLResponse(html)
+
+@app.get("/download/{arquivo}")
+def download(arquivo: str):
+    return FileResponse(arquivo, media_type="application/vnd.ms-excel")
