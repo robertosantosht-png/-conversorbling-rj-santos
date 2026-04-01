@@ -9,7 +9,7 @@ app = FastAPI()
 # ROTA PRINCIPAL – SERVE index.html
 @app.get("/", response_class=HTMLResponse)
 async def root():
-    with open("index.html", "r", encoding="utf-8") as f:
+    with open("index.txt", "r", encoding="utf-8") as f:
         return f.read()
 
 # ROTA DE CONVERSÃO
@@ -45,7 +45,7 @@ async def converter(
 # ROTA DE SUCESSO – SERVE sucesso.html
 @app.get("/sucesso", response_class=HTMLResponse)
 async def sucesso():
-    with open("sucesso.html", "r", encoding="utf-8") as f:
+    with open("sucesso.txt", "r", encoding="utf-8") as f:
         return f.read()
 
 # DOWNLOAD DA PLANILHA
